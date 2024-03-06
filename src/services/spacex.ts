@@ -1,0 +1,48 @@
+import { type Doc, type APISpaceXResponce } from "../types/api";
+
+
+export const getLaunchById = async ({ id }: { id: string }) => {
+  const res = await fetch(`https://api.spacexdata.com/v5/launches/${id}`);
+  const launch = (await res.json()) as Doc;
+  return launch
+}
+
+export const getLatestLaunches = async () => {
+  const res = await fetch("https://api.spacexdata.com/v5/launches/query", {
+    method: "POSt",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: {},
+      options: {
+        sort: {
+          date_unix: "asc",
+        },
+        limit: 12,
+      },
+    }),
+  });
+  const { docs: launches } = (await res.json()) as APISpaceXResponce;
+  return launches
+}
+
+export const getOldestLaunches = async () => {
+  const res = await fetch("https://api.spacexdata.com/v5/launches/query", {
+    method: "POSt",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: {},
+      options: {
+        sort: {
+          date_unix: "desc",
+        },
+        limit: 12,
+      },
+    }),
+  });
+  const { docs: launches } = (await res.json()) as APISpaceXResponce;
+  return launches
+}

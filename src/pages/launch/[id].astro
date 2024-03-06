@@ -1,0 +1,43 @@
+---
+import { getLaunchById, getLatestLaunches } from "../../services/spacex";
+import Layout from "../../layouts/Layout.astro";
+
+const { id } = Astro.params;
+
+let launch;
+if (id) {
+  launch = await getLaunchById({ id });
+}
+
+export async function getStaticPaths() {
+  const launches = await getLatestLaunches();
+  return launches.map((launch) => ({
+    params: { id: launch.id },
+  }));
+}
+const successText = launch?.success ? "Success" : "Failure";
+---
+
+<Layout title={`Lanzamiento ${launch?.flight_number}`}>
+  <article class="max-w-3xl mx-auto flex flex-col">
+    <picture>
+      <img
+        src={launch?.links.patch.small}
+        alt={`Patch for Launch #${launch?.flight_number}`}
+      />
+    </picture>
+    <span
+      class:list={[
+        "text-sm font-semibold mr-2 px-2.5 py-0.5 rounded w-16 mt-6 mb-4",
+        {
+          "bg-green-200 text-green-900": launch?.success,
+          "bg-red-200 text-red-900": !launch?.success,
+        },
+      ]}>{successText}</span
+    >
+    Flight #{launch?.flight_number}
+    <p class="my-2 font-bold tracking-tight Itext-white">
+      {launch?.details}
+    </p>
+  </article>
+</Layout>
